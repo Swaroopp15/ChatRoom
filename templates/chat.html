@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Room {{ room_id }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+            font-family: 'Inter', sans-serif;
+        }
+        #chat::-webkit-scrollbar { width: 6px; }
+        #chat::-webkit-scrollbar-thumb { background-color: rgba(107, 114, 128, 0.5); border-radius: 3px; }
+        .chat-bubble {
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .chat-bubble:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: max-content;
+            background-color: rgba(55,65,81,0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 2px 6px;
+            position: absolute;
+            z-index: 10;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-2">
+
+<div class="bg-white w-full max-w-xl flex flex-col rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold mb-4 text-center text-gray-800">Chat Rules & Info</h2>
+            <ul class="list-disc ml-5 space-y-2 text-gray-700">
+                <li>Internet connection is required.</li>
+                <li>Share the room ID to allow others to join.</li>
+                <li>Messages are encrypted with RSA (secure).</li>
+                <li>Do not share sensitive info publicly.</li>
+            </ul>
+            <button onclick="toggleInfo()" class="mt-6 w-full px-4 py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition">Close</button>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div class="flex justify-between items-center p-4 bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 text-white shadow-md">
+        <h2 class="text-xl font-bold">Room: {{ room_id }}</h2>
+        <button onclick="toggleInfo()" class="text-white text-lg hover:text-gray-200 transition">ℹ️</button>
+    </div>
+
+    <!-- Chat Area -->
+    <div id="chat" class="flex-1 overflow-y-auto p-4 space-y-3 h-[60vh] sm:h-[70vh] bg-gradient-to-b from-white/50 to-white/10 backdrop-blur-md">
+        {% for m in messages %}
+            <div class="flex flex-col {{ 'items-end' if m.role == username else ('items-center' if m.role == 'System' else 'items-start') }}">
+                <div class="chat-bubble max-w-[75%] px-4 py-3 rounded-2xl break-words
+                    {{ 'bg-gray-200 text-gray-700' if m.role == 'System' else ('bg-gradient-to-r from-green-400 to-green-600 text-white' if m.role == username else 'bg-gradient-to-r from-blue-400 to-blue-600 text-white') }}">
+                    <p class="font-semibold text-sm mb-1">{{ m.role }}</p>
+                    <p>{{ m.msg }}</p>
+                    <span class="tooltip"><p class="text-xs mt-1">{{ m.time }}</p><span class="tooltiptext">Sent at {{ m.time }}</span></span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Input Area -->
+    <div class="flex flex-col sm:flex-row items-center p-4 border-t bg-white/80 backdrop-blur-md sticky bottom-0">
+        <input id="messageInput" type="text" placeholder="Type a message..."
+               class="flex-1 px-4 py-2 mb-2 sm:mb-0 border rounded-full focus:outline-none focus:ring-2 focus:ring-green-400 transition">
+        <button onclick="sendMessage()" class="sm:ml-2 px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 w-full sm:w-auto transition">
+            Send
+        </button>
+    </div>
+
+    <!-- Invitation Button -->
+    <div class="p-4 border-t bg-white/80 backdrop-blur-md">
+        <button onclick="sendInvitation()"
+                class="w-full px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
+            Send Invitation via Gmail
+        </button>
+    </div>
+
+</div>
+
+<script>
+    const socket = io();
+    const roomId = "{{ room_id }}";
+    const username = "{{ username }}";
+
+    socket.emit('join', {room: roomId, username: username});
+
+    const input = document.getElementById('messageInput');
+
+    function sendMessage() {
+        const msg = input.value.trim();
+        if(msg){
+            socket.emit('send_message', {room: roomId, username: username, msg: msg});
+            input.value = '';
+        }
+    }
+
+    // Desktop only: send message on Enter
+    if (window.innerWidth >= 640) {
+        input.addEventListener('keypress', function(e) {
+            if(e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+
+    socket.on('receive_message', function(data){
+        const chatDiv = document.getElementById("chat");
+        const align = data.role === username ? 'items-end' : (data.role === 'System' ? 'items-center' : 'items-start');
+        const bgColor = data.role === 'System' ? 'bg-gray-200 text-gray-700' : (data.role === username ? 'bg-gradient-to-r from-green-400 to-green-600 text-white' : 'bg-gradient-to-r from-blue-400 to-blue-600 text-white');
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `flex flex-col ${align}`;
+        msgDiv.innerHTML = `
+            <div class="chat-bubble max-w-[75%] px-4 py-3 rounded-2xl break-words ${bgColor}">
+                <p class="font-semibold text-sm mb-1">${data.role}</p>
+                <p>${data.msg}</p>
+                <span class="tooltip"><p class="text-xs mt-1">${data.time}</p><span class="tooltiptext">Sent at ${data.time}</span></span>
+            </div>
+        `;
+        chatDiv.appendChild(msgDiv);
+        chatDiv.scrollTo({ top: chatDiv.scrollHeight, behavior: 'smooth' });
+    });
+
+    function toggleInfo() {
+        document.getElementById("infoModal").classList.toggle("hidden");
+    }
+
+    function sendInvitation() {
+        const link = `http://{{ server_ip }}:{{ server_port }}/${roomId}`;
+        const subject = encodeURIComponent("Join my encrypted chat room!");
+        const body = encodeURIComponent(`Hey,\n\nJoin my secure chat room using this link: ${link}\n\nRoom ID: ${roomId}`);
+        window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=&su=${subject}&body=${body}`, "_blank");
+    }
+</script>
+
+</body>
+</html>

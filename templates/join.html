@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Join Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 sm:p-12 rounded-2xl shadow-2xl w-full max-w-md text-center">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-6 text-gray-800">Join a Chat Room</h2>
+        <p class="text-gray-600 mb-6">Enter your name and the Room ID to join a secure chat.</p>
+
+        <form method="post" class="space-y-5">
+            <input type="text" name="username" placeholder="Your Name"
+                   class="w-full px-4 py-3 border rounded-xl text-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
+                   required>
+            <input type="text" name="room_id" placeholder="Room ID"
+                   class="w-full px-4 py-3 border rounded-xl text-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
+                   required>
+            <button type="submit"
+                    class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 active:bg-blue-700 transition duration-200">
+                Join Chat
+            </button>
+        </form>
+
+        <p class="mt-6 text-gray-400 text-sm">Make sure you have the correct Room ID to join.</p>
+    </div>
+
+</body>
+</html>
