@@ -1,30 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <title>Secure Chat</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>Secure Chat - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    // Tailwind dark mode config
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'gradient': 'gradient 15s ease infinite',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-10px)' },
+            },
+            gradient: {
+              '0%, 100%': {
+                'background-size': '200% 200%',
+                'background-position': 'left center'
+              },
+              '50%': {
+                'background-size': '200% 200%',
+                'background-position': 'right center'
+              }
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Gradient border glow */
+    .gradient-border {
+      position: relative;
+      border-radius: 1.5rem;
+    }
+    .gradient-border::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 1.5rem;
+      padding: 2px;
+      background: linear-gradient(135deg, #6d28d9, #3b82f6, #10b981);
+      -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events: none;
+      animation: gradient 8s ease infinite;
+    }
+    
+    .glass-effect {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background-color: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+    
+    .dark .glass-effect {
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      background-color: rgba(17, 25, 40, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.125);
+    }
+    
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.5;
+      z-index: 0;
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+      50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); }
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-purple-100 to-purple-300 flex items-center justify-center min-h-screen p-4">
+<body class="min-h-screen bg-gradient-to-br from-purple-100 via-blue-100 to-indigo-100 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 flex items-center justify-center p-4 transition-colors duration-500 overflow-hidden">
 
-    <div class="bg-white p-8 sm:p-12 rounded-2xl shadow-2xl w-full max-w-md text-center">
-        <h1 class="text-3xl sm:text-4xl font-bold mb-6 text-gray-800">Welcome to Encrypted Chat 🔒</h1>
-        <p class="text-gray-600 mb-8">Securely host or join a chat room with your friends.</p>
+  <!-- Background particles -->
+  <div id="particles" class="absolute inset-0 overflow-hidden"></div>
+  
+  <!-- Theme Toggle -->
+  <button id="theme-toggle" class="absolute top-6 right-6 z-20 w-12 h-12 rounded-full glass-effect shadow-lg hover:scale-110 transition-all duration-300 flex items-center justify-center text-xl">
+    🌙
+  </button>
 
-        <form method="post" class="flex flex-col sm:flex-row justify-center gap-4">
-            <button name="choice" value="host"
-                    class="flex-1 px-6 py-3 bg-green-500 text-white font-semibold rounded-xl hover:bg-green-600 active:bg-green-700 transition duration-200">
-                Host a Chat
-            </button>
-            <button name="choice" value="join"
-                    class="flex-1 px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 active:bg-blue-700 transition duration-200">
-                Join a Chat
-            </button>
-        </form>
+  <div class="gradient-border w-full max-w-md mx-4">
+    <div class="relative glass-effect rounded-2xl shadow-2xl p-8 sm:p-10 text-center z-10">
+      
+      <!-- Animated logo -->
+      <div class="mb-6 animate-float">
+        <div class="w-24 h-24 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg">
+          <i class="fas fa-lock text-white text-4xl"></i>
+        </div>
+      </div>
+      
+      <h1 class="text-3xl sm:text-4xl font-extrabold mb-4 bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400 bg-clip-text text-transparent tracking-tight">
+        Secure Encrypted Chat
+      </h1>
+      <p class="text-gray-600 dark:text-gray-300 mb-8 text-lg font-light">
+        Host or join end-to-end encrypted chat rooms with complete privacy.
+      </p>
 
-        <p class="mt-6 text-gray-400 text-sm">All chats are encrypted for your privacy.</p>
+      <form method="post" class="flex flex-col sm:flex-row gap-4 mb-8">
+        <button name="choice" value="host"
+          class="flex-1 px-6 py-3.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:from-green-600 hover:to-emerald-700 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center justify-center gap-2">
+          <i class="fas fa-plus"></i> Host Chat
+        </button>
+        <button name="choice" value="join"
+          class="flex-1 px-6 py-3.5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl shadow-lg hover:from-blue-600 hover:to-indigo-700 transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center justify-center gap-2">
+          <i class="fas fa-sign-in-alt"></i> Join Chat
+        </button>
+      </form>
+
+      <div class="bg-purple-50 dark:bg-indigo-900/30 rounded-xl p-4 border border-purple-100 dark:border-indigo-700/50">
+        <p class="text-gray-600 dark:text-gray-300 text-sm flex items-center justify-center gap-2">
+          <span class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+          <span class="font-medium">All chats are <span class="text-purple-600 dark:text-purple-400 font-semibold">end-to-end encrypted</span></span>
+        </p>
+      </div>
+
+      <!-- Features list -->
+      <div class="mt-8 grid grid-cols-2 gap-4 text-left">
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+          <i class="fas fa-shield-alt text-purple-500"></i>
+          <span class="text-sm">Military-grade encryption</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+          <i class="fas fa-bolt text-purple-500"></i>
+          <span class="text-sm">Real-time messaging</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+          <i class="fas fa-user-clock text-purple-500"></i>
+          <span class="text-sm">No registration needed</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+          <i class="fas fa-hourglass-half text-purple-500"></i>
+          <span class="text-sm">Auto-expiring chats</span>
+        </div>
+      </div>
     </div>
+  </div>
 
+  <script>
+    // Theme toggle
+    const toggleBtn = document.getElementById("theme-toggle");
+    const html = document.documentElement;
+
+    // Load saved theme
+    if (localStorage.getItem("theme") === "light") {
+      html.classList.remove("dark");
+      toggleBtn.textContent = "🌙";
+    } else {
+      html.classList.add("dark");
+      toggleBtn.textContent = "☀️";
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      html.classList.toggle("dark");
+      if (html.classList.contains("dark")) {
+        localStorage.setItem("theme", "dark");
+        toggleBtn.textContent = "☀️";
+      } else {
+        localStorage.setItem("theme", "light");
+        toggleBtn.textContent = "🌙";
+      }
+      
+      // Update particles for new theme
+      document.getElementById('particles').innerHTML = '';
+      createParticles();
+    });
+
+    // Create background particles
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 12;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+        
+        // Random properties
+        const size = Math.random() * 40 + 10;
+        const posX = Math.random() * 100;
+        const posY = Math.random() * 100;
+        const delay = Math.random() * 5;
+        const duration = Math.random() * 15 + 10;
+        
+        // Apply styles
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${posX}%`;
+        particle.style.top = `${posY}%`;
+        particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+        
+        // Color based on theme
+        if (document.documentElement.classList.contains('dark')) {
+          particle.style.background = 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, rgba(79,70,229,0.2) 100%)';
+        } else {
+          particle.style.background = 'radial-gradient(circle, rgba(139,92,246,0.3) 0%, rgba(79,70,229,0.2) 100%)';
+        }
+        
+        container.appendChild(particle);
+      }
+    }
+    
+    // Initialize particles
+    createParticles();
+  </script>
 </body>
 </html>

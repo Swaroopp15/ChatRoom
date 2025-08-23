@@ -1,29 +1,239 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Enter Name</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center min-h-screen p-4">
+<html lang="en" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Join Room</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <div class="bg-white p-8 sm:p-12 rounded-2xl shadow-2xl w-full max-w-md text-center">
-        <h2 class="text-3xl sm:text-4xl font-bold mb-6 text-gray-800">Join Room <span class="text-blue-600">{{ room_id }}</span></h2>
-        <p class="text-gray-600 mb-6">Enter your name to join the chat securely.</p>
+    <!-- Tailwind with dark mode support -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'gradient': 'gradient 15s ease infinite',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              gradient: {
+                '0%, 100%': {
+                  'background-size': '200% 200%',
+                  'background-position': 'left center'
+                },
+                '50%': {
+                  'background-size': '200% 200%',
+                  'background-position': 'right center'
+                }
+              }
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+      .glass-effect {
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        background-color: rgba(255, 255, 255, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.125);
+      }
+      
+      .dark .glass-effect {
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        background-color: rgba(17, 25, 40, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.125);
+      }
+      
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.5;
+        z-index: 0;
+      }
+      
+      .gradient-border {
+        position: relative;
+        border-radius: 1.5rem;
+      }
+      .gradient-border::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: 1.5rem;
+        padding: 2px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1, #8b5cf6);
+        -webkit-mask: 
+          linear-gradient(#fff 0 0) content-box, 
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+                mask-composite: exclude;
+        pointer-events: none;
+        animation: gradient 8s ease infinite;
+      }
+      
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .animate-fadeIn {
+        animation: fadeIn 0.6s ease-out;
+      }
+    </style>
+
+    <script>
+      // Dark mode toggle
+      function toggleTheme() {
+        document.documentElement.classList.toggle('dark')
+        localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light')
+        updateThemeIcon();
+        // Update particles for new theme
+        document.getElementById('particles').innerHTML = '';
+        createParticles();
+      }
+      
+      // Update theme icon based on current theme
+      function updateThemeIcon() {
+        const themeBtn = document.getElementById('theme-toggle');
+        if (document.documentElement.classList.contains('dark')) {
+          themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+          themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+      }
+      
+      // Persist theme on reload
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark')
+      }
+      
+      // Create background particles
+      function createParticles() {
+        const container = document.getElementById('particles');
+        const particleCount = 12;
         
-        <form method="post" class="space-y-5">
-            <input type="text" name="username" placeholder="Your Name"
-                   class="w-full px-4 py-3 border rounded-xl text-center focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200"
-                   required>
-            <button type="submit"
-                    class="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 active:bg-blue-700 transition duration-200">
-                Join Room
-            </button>
+        for (let i = 0; i < particleCount; i++) {
+          const particle = document.createElement('div');
+          particle.classList.add('particle');
+          
+          // Random properties
+          const size = Math.random() * 40 + 10;
+          const posX = Math.random() * 100;
+          const posY = Math.random() * 100;
+          const delay = Math.random() * 5;
+          const duration = Math.random() * 15 + 10;
+          
+          // Apply styles
+          particle.style.width = `${size}px`;
+          particle.style.height = `${size}px`;
+          particle.style.left = `${posX}%`;
+          particle.style.top = `${posY}%`;
+          particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+          
+          // Color based on theme
+          if (document.documentElement.classList.contains('dark')) {
+            particle.style.background = 'radial-gradient(circle, rgba(96,165,250,0.4) 0%, rgba(139,92,246,0.2) 100%)';
+          } else {
+            particle.style.background = 'radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(139,92,246,0.2) 100%)';
+          }
+          
+          container.appendChild(particle);
+        }
+      }
+      
+      // Initialize when page loads
+      document.addEventListener('DOMContentLoaded', function() {
+        updateThemeIcon();
+        createParticles();
+        
+        // Add input focus effects
+        const input = document.querySelector('input');
+        input.addEventListener('focus', () => {
+          input.parentElement.classList.add('ring-2', 'ring-blue-400/30', 'rounded-xl');
+        });
+        
+        input.addEventListener('blur', () => {
+          input.parentElement.classList.remove('ring-2', 'ring-blue-400/30', 'rounded-xl');
+        });
+      });
+    </script>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-blue-100 via-indigo-100 to-purple-100 dark:from-gray-900 dark:via-gray-800 dark:to-indigo-900 flex items-center justify-center p-4 transition-colors duration-500 overflow-hidden">
+    
+    <!-- Background particles -->
+    <div id="particles" class="absolute inset-0 overflow-hidden"></div>
+    
+    <!-- Back button -->
+    <a href="index.html" class="fixed top-4 left-4 z-50 w-10 h-10 rounded-full glass-effect shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+      <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <!-- Theme Toggle -->
+    <button id="theme-toggle" onclick="toggleTheme()" class="fixed top-4 right-4 z-50 w-10 h-10 rounded-full glass-effect shadow-lg flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">
+      <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="gradient-border w-full max-w-md mx-4">
+      <!-- Card -->
+      <div class="glass-effect p-8 sm:p-10 rounded-2xl shadow-2xl text-center animate-fadeIn">
+        
+        <!-- Animated logo -->
+        <div class="mb-6 animate-float">
+          <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center shadow-lg">
+            <i class="fas fa-comments text-white text-3xl"></i>
+          </div>
+        </div>
+        
+        <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+          Join Room <span class="text-blue-600 dark:text-blue-400">ChatSpace</span>
+        </h2>
+        <p class="text-gray-700 dark:text-gray-300 mb-8 font-light">
+          Enter your name to join the chat securely.
+        </p>
+
+        <form method="post" class="space-y-6">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-user text-gray-400"></i>
+            </div>
+            <input type="text" name="username" placeholder="Your Name" 
+                   class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl text-left bg-white/70 dark:bg-gray-800/60 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition duration-200" 
+                   required />
+          </div>
+
+          <button type="submit" 
+                  class="w-full px-6 py-3.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 transform hover:-translate-y-0.5 active:translate-y-0 shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2">
+            <i class="fas fa-door-open"></i> Join Room
+          </button>
         </form>
 
-        <p class="mt-6 text-gray-400 text-sm">This name will be visible to other participants in the chat.</p>
+        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
+          <p class="text-gray-500 dark:text-gray-400 text-sm flex items-center justify-center">
+            <i class="fas fa-shield-alt mr-2"></i>This name will be visible to other participants in the chat.
+          </p>
+        </div>
+        
+        <!-- Room info -->
+        <div class="mt-6 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-3">
+          <p class="text-sm text-blue-700 dark:text-blue-300 flex items-center justify-center gap-2">
+            <i class="fas fa-info-circle"></i> Room ID: <span class="font-mono font-bold">{room_id}</span>
+          </p>
+        </div>
+      </div>
     </div>
-
-</body>
+  </body>
 </html>
