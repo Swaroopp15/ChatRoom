@@ -1,8 +1,7 @@
 flask
+flask-cors
+flask-socketio
 eventlet
-fastapi
-uvicorn
+gunicorn
 sqlalchemy
 pydantic
-gunicorn
-requests
